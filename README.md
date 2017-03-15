@@ -15,7 +15,6 @@ while (<STDIN>) {
 
     # find the timestamp section of an httpd log
     if (/\[.*\]/) {
-        #print $&, "\n";
         my ($date, $hour, $minute, $seconds) = split(':', $&);
         my $fullTimestamp = join(':', ($date, $hour, $minute));
         if ( $log{$fullTimestamp} ) {
