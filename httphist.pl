@@ -23,11 +23,6 @@ while (<STDIN>) {
 
 }
 
-# holy fuck this is nondeterministic
-#while( my( $key, $val ) = each %log ) {
-#    $val =~ s/ (\d+)$/"="x($1)/e ;
-#    print "$key\t=>$val\n";
-#}
 my @output;
 
 while( my( $key, $val ) = each %log ) {
