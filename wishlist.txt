@@ -1,0 +1,12 @@
+wish list of arguments:
+    reduce scale
+    show only POSTs
+    show only GETs
+    show only . . .
+    show bandwidth histogram
+
+Ok, so how do you handle command-line arguments?
+
+@ARGV holds the arguments.
+$0 is the name of the executable. (Interpretable?)
+
