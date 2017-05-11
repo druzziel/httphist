@@ -72,7 +72,6 @@ while( my( $key, $val ) = each %log ) {
         $val =~ s/(\d+)$/"="x($1)/e ;
     }
 	my $myString = "$key\t$val\n";
-	print "$myString\n";
     push @output, $myString;
 }
 
