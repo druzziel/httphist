@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import datetime,time,sys
+from subprocess import check_output
 
 TIME_FORMAT = '%d/%b/%Y:%H:%M'
 apache_timestamp = '15/Oct/2018:15:59'
@@ -40,21 +41,31 @@ def compare_times( time_obj1, time_obj2 ):
     else:
         return False
 
+def usage():
+    print """usage: %s <logfile>
+Where <logfile> is an Apache combined log.""" % sys.argv[0]
+
 if __name__ == "__main__":
 
-    filename = sys.argv[1]
+    if len(sys.argv) == 1:
+        usage()
+        sys.exit()
 
-    fp = open(filename)
-    lines = fp.readlines()
+
+    filename = sys.argv[1]
+    lines = check_output("awk '{print $4}' " + filename + " | cut -d\: -f1-3 | tr -d \[ | sort | uniq -c | egrep -v '(\-$|^$)'", shell=True).split('\n')
+    fp = open("debug.txt", 'w')
+    fp.write("%s" % lines)
     fp.close()
     for x in range(1, len(lines) ):
-            lastline = lines[x -1].strip()
-            thisline = lines[x].strip()
-            lasttime = extract_time( lastline )
+        lastline = lines[x -1].strip()
+        thisline = lines[x].strip()
+        lasttime = extract_time( lastline )
+        if len(thisline) == 0:
+            thistime = increment_timestamp( lasttime )
+        else:
             thistime = extract_time( thisline )
-            bits = lastline.split()
-            time_obj = convert_timestamp( bits[1] )
-            print_output_line( (bits[0], time_obj) )
-            while not compare_times( lasttime, thistime ):
-                lasttime = increment_timestamp( lasttime )
-                print_output_line( (0, lasttime) )
+        print_output_line( (lastline.split()[0], lasttime) )
+        while not compare_times( lasttime, thistime ):
+            lasttime = increment_timestamp( lasttime )
+            print_output_line( (0, lasttime) )
