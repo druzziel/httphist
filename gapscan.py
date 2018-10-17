@@ -61,6 +61,8 @@ if __name__ == "__main__":
         lastline = lines[x -1].strip()
         thisline = lines[x].strip()
         lasttime = extract_time( lastline )
+        # if this is a blank line, ignore it and fill it in
+        # with the next sequential timestamp
         if len(thisline) == 0:
             thistime = increment_timestamp( lasttime )
         else:
