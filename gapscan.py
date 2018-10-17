@@ -53,8 +53,11 @@ if __name__ == "__main__":
 
 
     filename = sys.argv[1]
-    lines = check_output("awk '{print $4}' " + filename + " | cut -d\: -f1-3 | tr -d \[ | sort | uniq -c | egrep -v '(\-$|^$)'", shell=True).split('\n')
+    ncsa_timestamp_regex = "[0-9]+/[A-Z][a-z]+/[0-9]{4}(.*?\])"
+    search_command="egrep -o '" + ncsa_timestamp_regex + "' " + filename + " | cut -d\: -f1-3 | tr -d \[ | sort | uniq -c"
+    lines = check_output(search_command, shell=True).split('\n')
     fp = open("debug.txt", 'w')
+    fp.write("%s\n" % search_command)
     fp.write("%s" % lines)
     fp.close()
     for x in range(1, len(lines) ):
