@@ -6,6 +6,7 @@ from subprocess import check_output
 TIME_FORMAT = '%d/%b/%Y:%H:%M'
 apache_timestamp = '15/Oct/2018:15:59'
 one_minute_delta = datetime.timedelta( minutes = 1 )
+DEBUG=False
 
 def convert_timestamp(apache_timestamp):
     """convert an Apache datetime string to a Python datetime object"""
@@ -53,13 +54,14 @@ if __name__ == "__main__":
 
 
     filename = sys.argv[1]
-    ncsa_timestamp_regex = "[0-9]+/[A-Z][a-z]+/[0-9]{4}(.*?\])"
+    ncsa_timestamp_regex = "[0-9]+/[A-Z][a-z]+/[0-9]{4}:[0-9]{2}:[0-9]{2}:[0-9]{2}(.*?\])"
     search_command="egrep -o '" + ncsa_timestamp_regex + "' " + filename + " | cut -d\: -f1-3 | tr -d \[ | sort | uniq -c"
     lines = check_output(search_command, shell=True).split('\n')
-    fp = open("debug.txt", 'w')
-    fp.write("%s\n" % search_command)
-    fp.write("%s" % lines)
-    fp.close()
+    if DEBUG:
+        fp = open("debug.txt", 'w')
+        fp.write("%s\n" % search_command)
+        fp.write("%s" % lines)
+        fp.close()
     for x in range(1, len(lines) ):
         lastline = lines[x -1].strip()
         thisline = lines[x].strip()
