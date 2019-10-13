@@ -1,9 +1,9 @@
 # httphist
-Perl script for generating a histogram of requests per minute from common httpd logs
+Python script for generating a histogram of requests per minute from common httpd logs
 
 # Usage
 
-    #./httphist.pl < access.log
+    #./httphist <access.log> [<scaling factor>]
 
 Where access.log has the Apache common log format, e.g.:
 
@@ -17,6 +17,8 @@ Where access.log has the Apache common log format, e.g.:
     78.136.44.21 - - [12/Mar/2017:03:16:01 +0000] "GET / HTTP/1.1" 200 24037 "-" "Iguana Monitoring/1.1 (https://monitoring.api.)"
     50.57.61.5 - - [12/Mar/2017:03:16:37 +0000] "GET / HTTP/1.1" 200 24037 "-" "Iguana Monitoring/1.1 (https://monitoring.api.)"
     50.56.142.171 - - [12/Mar/2017:03:16:44 +0000] "GET / HTTP/1.1" 200 24037 "-" "Iguana Monitoring/1.1 (https://monitoring.api.)"
+
+And scaling factor is a number used to shorten the historgram lines in output.
 
 # Output
 
