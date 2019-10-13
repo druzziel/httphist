@@ -73,8 +73,13 @@ def convert_timestamp(apache_timestamp):
 def extractTime( input_line ):
     """Takes a line from the input file and returns a time object based on that line's timestamp"""
     bits = input_line.split()
-    apache_timestamp = bits[3][1:-3]
-    return convert_timestamp( apache_timestamp )
+    for field in bits:
+        apache_timestamp = field[1:-3]
+        try:
+            return convert_timestamp( apache_timestamp )
+        except:
+            pass
+    raise ValueError, "Unreachable line reached - no timestamp found in input line {}".format( input_line )
 
 #############################
 # End Time-handling functions
