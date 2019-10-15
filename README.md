@@ -22,9 +22,9 @@ Where access.log has the Apache common log format, e.g.:
     50.57.61.5 - - [12/Mar/2017:03:16:37 +0000] "GET / HTTP/1.1" 200 24037 "-" "Iguana Monitoring/1.1 (https://monitoring.api.)"
     50.56.142.171 - - [12/Mar/2017:03:16:44 +0000] "GET / HTTP/1.1" 200 24037 "-" "Iguana Monitoring/1.1 (https://monitoring.api.)"
 
-And scaling factor is a number used to shorten the historgram lines in output.</ br>
-Use the -a (--autoscale) flag to automatically scale the histogram lines down to an optional COLUMNS width.</ br>
-If -c (--columns, --cols) is not provided, COLUMNS defaults to 60.</ br>
+- And scaling factor is a number used to shorten the historgram lines in output.
+- Use the -a (--autoscale) flag to automatically scale the histogram lines down to an optional COLUMNS width.
+- If -c (--columns, --cols) is not provided, COLUMNS defaults to 60.
 
 # Output
 
