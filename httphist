@@ -131,6 +131,8 @@ if __name__ == "__main__":
         type=int)
 
     args = parser.parse_args()
+    if args.scaling_factor:
+        SCALE_FACTOR = args.scaling_factor
     
     fp = openLog( args.logfile )
 
