@@ -3,7 +3,8 @@ Python script for generating a histogram of requests per minute from common http
 
 # Usage
 
-    #./httphist <access.log> [<scaling factor>]
+	httphist [-h] [-s SCALING_FACTOR] [-a] [-c COLUMNS] logfile
+
 
 Where access.log has the Apache common log format, e.g.:
 
@@ -19,16 +20,11 @@ Where access.log has the Apache common log format, e.g.:
     50.56.142.171 - - [12/Mar/2017:03:16:44 +0000] "GET / HTTP/1.1" 200 24037 "-" "Iguana Monitoring/1.1 (https://monitoring.api.)"
 
 And scaling factor is a number used to shorten the historgram lines in output.
+Use the -a (--autoscale) flag to automatically scale the histogram lines down to an optional COLUMNS width.
+If -c (--columns, --cols) is not provided, COLUMNS defaults to 60.
 
 # Output
 
-    15/Mar/2017:00:26  ===
-    15/Mar/2017:00:27  ===
-    15/Mar/2017:00:28  =========
-    15/Mar/2017:00:29  =====
-    15/Mar/2017:00:30  =======
-    15/Mar/2017:00:31  ======
-    15/Mar/2017:00:32  =============
-    15/Mar/2017:00:33  ==========
-    15/Mar/2017:00:34  ======
-
+	2017-03-12 03:14:00    3 ###
+	2017-03-12 03:15:00    4 ####
+	2017-03-12 03:16:00    3 ###
