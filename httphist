@@ -30,7 +30,7 @@ def printDictionary( dictionary ):
     for dkey in dkeys:
         count = dictionary[dkey]
         histoLine = getHistogramLine( count )
-        print "{}  {}\t{}".format(dkey, count, histoLine)
+        print "{0}  {1:>3}\t{2}".format(dkey, count, histoLine)
 
 def getHistogramLine( lineCount ):
     # return a string of hash marks
@@ -38,9 +38,9 @@ def getHistogramLine( lineCount ):
     # where scaleFactor defaults to 1.  Increasing scaleFactor changes
     # the scale of the histogram
     length = math.ceil( float(lineCount) / float(SCALE_FACTOR) )
-    return repeat_to_length( '#', int(length) )
+    return repeatToLength( '#', int(length) )
     
-def repeat_to_length(string_to_expand, length):
+def repeatToLength(string_to_expand, length):
     # thanks, stackoverflow.com.  
     # takes a string and a length, and returns 
     # that string repeated to that length.
@@ -62,7 +62,7 @@ def populateDictionary( logfile, dictionary ):
 # Time-handling functions
 #############################
 
-def convert_timestamp(apache_timestamp):
+def convertTimestamp(apache_timestamp):
     """convert an Apache datetime string to a Python datetime object"""
     try:
         time_obj = datetime.datetime.strptime( apache_timestamp, TIME_FORMAT )
@@ -76,7 +76,7 @@ def extractTime( input_line ):
     for field in bits:
         apache_timestamp = field[1:-3]
         try:
-            return convert_timestamp( apache_timestamp )
+            return convertTimestamp( apache_timestamp )
         except:
             pass
     raise ValueError, "Unreachable line reached - no timestamp found in input line {}".format( input_line )
@@ -108,10 +108,10 @@ if __name__ == "__main__":
     try:
         fp = open( logFileName )
     except:
-        print "Sorry, I couldn't open {}.  Exiting.".format( logFileName )
+        print "Sorry, I couldn't open {0}.  Exiting.".format( logFileName )
         sys.exit()
 
-    # obtain first and last lines so we know start and end dates
+    # obtain first and last lines so we know start and end times
     firstline = fp.readline()
     for line in fp:
         pass
