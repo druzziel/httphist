@@ -6,7 +6,7 @@ import datetime, sys, math, operator
 TIME_FORMAT = '%d/%b/%Y:%H:%M'
 ONE_MINUTE = datetime.timedelta( minutes = 1 )
 SCALE_FACTOR = 1
-CATS_COLUMNS = 60   # Number of columns in a CATS ticket comment
+COLUMNS = 60
 
 
 ##########################################################
@@ -25,30 +25,25 @@ def getDictionary( startTime, endTime ):
         i += ONE_MINUTE
     return emptyDictionary 
 
-def printDictionary( dictionary ):
+def printDictionary( dictionary, autoscale=True ):
     longestLine = max(dictionary.iteritems(), key=operator.itemgetter(1))[1]
+    autoscale_factor = float(COLUMNS) / longestLine
+    if ( autoscale_factor >= 1 ) or ( not autoscale ):
+        autoscale_factor = 1
     dkeys = dictionary.keys()
     dkeys.sort()
     for dkey in dkeys:
         count = dictionary[dkey]
-        histoLine = getHistogramLine( count )
+        histoLine = getHistogramLine( int( count * autoscale_factor ) )
         print "{0} {1:>4} {2}".format(dkey, count, histoLine)
 
 def getHistogramLine( lineCount ):
     # return a string of hash marks
     # the number of hash marks is lineCount / scaleFactor,
-    # where scaleFactor defaults to 1.  Increasing scaleFactor changes
+    # where scaleFactor defaults to 1.  Increasing scaleFactor reduces
     # the scale of the histogram
     length = math.ceil( float(lineCount) / float(SCALE_FACTOR) )
-    return repeatToLength( '#', int(length) )
-    
-def repeatToLength(string_to_expand, length):
-    # thanks, stackoverflow.com.  
-    # takes a string and a length, and returns 
-    # that string repeated to that length.
-    # Just the thing for histogram bars.
-    rough_length = ((length/len(string_to_expand))+1)
-    return (string_to_expand * rough_length)[:length]
+    return '#' * int(length)
 
 def populateDictionary( logfile, dictionary ):
     logfile.seek(0)
@@ -132,9 +127,19 @@ if __name__ == "__main__":
         help="reduce the length of histogram lines by dividing by this value",
         type=int)
 
+    parser.add_argument("-a", "--autoscale",
+        help="automatically reduce histogram length to fit screen",
+        action="store_true")
+
+    parser.add_argument("-c", "--columns", "--cols",
+        help="specify maximum column width",
+        type=int)
+
     args = parser.parse_args()
     if args.scaling_factor:
         SCALE_FACTOR = args.scaling_factor
+    if args.columns:
+        COLUMNS = args.columns
     
     fp = openLog( args.logfile )
 
@@ -146,8 +151,8 @@ if __name__ == "__main__":
 
     # fill 'er up
     populateDictionary( fp, myDictionary )
-
     fp.close()  # it's polite.
 
     # show us what you got
-    printDictionary( myDictionary )
+    autoscale = args.autoscale 
+    printDictionary( myDictionary, autoscale=autoscale )
