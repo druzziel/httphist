@@ -81,10 +81,36 @@ def extractTime( input_line ):
             pass
     raise ValueError, "Unreachable line reached - no timestamp found in input line {}".format( input_line )
 
-#############################
+##############################
 # End Time-handling functions
+##############################
+
+
+
+#############################
+# Main loop helper functions
 #############################
 
+def openLog( logFileName ):
+    try:
+        fp = open( logFileName )
+    except:
+        print "Sorry, I couldn't open {0}.  Exiting.".format( logFileName )
+        sys.exit()
+    return fp
+
+def getLogStartandStopTimes( fp ):
+    firstline = fp.readline()
+    for line in fp:
+        pass
+    lastline = line
+    startTime = extractTime( firstline )
+    endTime = extractTime( lastline )
+    return startTime, endTime
+
+#################################
+# End Main loop helper functions
+#################################
 
 def usage():
     print """usage: %s <logfile> [ scale_factor ]
@@ -93,38 +119,31 @@ scale_factor can be used to shorten output lines.""" % sys.argv[0]
 
 if __name__ == "__main__":
 
-    if len(sys.argv) == 1:
-        usage()
-        sys.exit()
+    import argparse
+    parser = argparse.ArgumentParser()
 
-    logFileName = sys.argv[1]
+    parser.add_argument("logfile",
+        help="Apache/NCSA log file to analyze",
+        type=str)
 
-    # see if we were passed a scaling factor
-    try:
-        SCALE_FACTOR = float(sys.argv[2])
-    except:
-        pass
+    parser.add_argument("-s", "--scaling_factor", 
+        help="reduce the length of histogram lines by dividing by this value",
+        type=int)
+
+    args = parser.parse_args()
     
-    try:
-        fp = open( logFileName )
-    except:
-        print "Sorry, I couldn't open {0}.  Exiting.".format( logFileName )
-        sys.exit()
+    fp = openLog( args.logfile )
 
     # obtain first and last lines so we know start and end times
-    firstline = fp.readline()
-    for line in fp:
-        pass
-    lastline = line
-    startTime = extractTime( firstline )
-    endTime = extractTime( lastline )
-
+    startTime, endTime = getLogStartandStopTimes( fp )
 
     # create a dictionary to hold our data
     myDictionary = getDictionary(startTime, endTime)
 
     # fill 'er up
     populateDictionary( fp, myDictionary )
+
+    fp.close()  # it's polite.
 
     # show us what you got
     printDictionary( myDictionary )
