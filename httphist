@@ -17,15 +17,15 @@ COLUMNS = 60
 # that minute.
 ##########################################################
 
-def getDictionary( startTime, endTime ):
+def get_dictionary( startTime, endTime ):
     i = startTime
-    emptyDictionary = {}
+    empty_dictionary = {}
     while i <= endTime:
-        emptyDictionary[i] = 0
+        empty_dictionary[i] = 0
         i += ONE_MINUTE
-    return emptyDictionary 
+    return empty_dictionary 
 
-def printDictionary( dictionary, autoscale=True ):
+def print_dictionary( dictionary, autoscale=False ):
     longestLine = max(dictionary.iteritems(), key=operator.itemgetter(1))[1]
     autoscale_factor = float(COLUMNS) / longestLine
     if ( autoscale_factor >= 1 ) or ( not autoscale ):
@@ -34,10 +34,10 @@ def printDictionary( dictionary, autoscale=True ):
     dkeys.sort()
     for dkey in dkeys:
         count = dictionary[dkey]
-        histoLine = getHistogramLine( int( count * autoscale_factor ) )
+        histoLine = get_histogram_line( int( count * autoscale_factor ) )
         print "{0} {1:>4} {2}".format(dkey, count, histoLine)
 
-def getHistogramLine( lineCount ):
+def get_histogram_line( lineCount ):
     # return a string of hash marks
     # the number of hash marks is lineCount / scaleFactor,
     # where scaleFactor defaults to 1.  Increasing scaleFactor reduces
@@ -45,11 +45,14 @@ def getHistogramLine( lineCount ):
     length = math.ceil( float(lineCount) / float(SCALE_FACTOR) )
     return '#' * int(length)
 
-def populateDictionary( logfile, dictionary ):
+def populate_dictionary( logfile, dictionary ):
     logfile.seek(0)
     for line in logfile:
-        timestamp = extractTime( line )
-        dictionary[timestamp] += 1
+        try:   # throw away any line without a timestamp
+            timestamp = extract_time( line )
+            dictionary[timestamp] += 1
+        except:
+            next
 
 #############################
 # End Dictionary Functions
@@ -59,7 +62,7 @@ def populateDictionary( logfile, dictionary ):
 # Time-handling functions
 #############################
 
-def convertTimestamp(apache_timestamp):
+def convert_timestamp(apache_timestamp):
     """convert an Apache datetime string to a Python datetime object"""
     try:
         time_obj = datetime.datetime.strptime( apache_timestamp, TIME_FORMAT )
@@ -67,13 +70,13 @@ def convertTimestamp(apache_timestamp):
         raise TypeError, "%s is not a timestamp I recognize." % apache_timestamp
     return time_obj
 
-def extractTime( input_line ):
+def extract_time( input_line ):
     """Takes a line from the input file and returns a time object based on that line's timestamp"""
     bits = input_line.split()
     for field in bits:
         apache_timestamp = field[1:-3]
         try:
-            return convertTimestamp( apache_timestamp )
+            return convert_timestamp( apache_timestamp )
         except:
             pass
     raise ValueError, "Unreachable line reached - no timestamp found in input line {}".format( input_line )
@@ -96,13 +99,13 @@ def openLog( logFileName ):
         sys.exit()
     return fp
 
-def getLogStartandStopTimes( fp ):
+def get_log_start_and_stop_times( fp ):
     firstline = fp.readline()
     for line in fp:
         pass
     lastline = line
-    startTime = extractTime( firstline )
-    endTime = extractTime( lastline )
+    startTime = extract_time( firstline )
+    endTime = extract_time( lastline )
     return startTime, endTime
 
 #################################
@@ -117,7 +120,7 @@ scale_factor can be used to shorten output lines.""" % sys.argv[0]
 if __name__ == "__main__":
 
     import argparse
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="generate a histogram from an Apache/NCSA log file showing per-minute usage")
 
     parser.add_argument("logfile",
         help="Apache/NCSA log file to analyze",
@@ -144,15 +147,15 @@ if __name__ == "__main__":
     fp = openLog( args.logfile )
 
     # obtain first and last lines so we know start and end times
-    startTime, endTime = getLogStartandStopTimes( fp )
+    startTime, endTime = get_log_start_and_stop_times( fp )
 
     # create a dictionary to hold our data
-    myDictionary = getDictionary(startTime, endTime)
+    myDictionary = get_dictionary(startTime, endTime)
 
     # fill 'er up
-    populateDictionary( fp, myDictionary )
+    populate_dictionary( fp, myDictionary )
     fp.close()  # it's polite.
 
     # show us what you got
     autoscale = args.autoscale 
-    printDictionary( myDictionary, autoscale=autoscale )
+    print_dictionary( myDictionary, autoscale=autoscale )
