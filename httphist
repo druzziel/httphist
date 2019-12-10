@@ -53,6 +53,16 @@ def populate_dictionary( logfile, dictionary ):
         except:
             next
 
+def filter_by_time( dictionary, startTime, endTime ):
+    # return only those dictionary key-value pairs where the key falls between startTime and endTime
+    filtered = dict()
+
+    for (timeStamp, itemCount) in dictionary.items():
+        if timeStamp <= endTime and timeStamp >= startTime:
+            filtered[timeStamp] = itemCount
+
+    return filtered
+
 #############################
 # End Dictionary Functions
 #############################
@@ -99,6 +109,7 @@ def openLog( logFileName ):
     return fp
 
 def get_log_start_and_stop_times( fp ):
+    fp.seek(0)
     firstline = fp.readline()
     for line in fp:
         pass
@@ -107,19 +118,7 @@ def get_log_start_and_stop_times( fp ):
     endTime = extract_time( lastline )
     return startTime, endTime
 
-#################################
-# End Main loop helper functions
-#################################
-
-def usage():
-    print """usage: %s <logfile> [ scale_factor ]
-Where <logfile> is an Apache combined log, and
-scale_factor can be used to shorten output lines.""" % sys.argv[0]
-
-if __name__ == "__main__":
-
-    import argparse
-    parser = argparse.ArgumentParser(description="generate a histogram from an Apache/NCSA log file showing per-minute usage")
+def add_arguments(parser):
 
     parser.add_argument("logfile",
         help="Apache/NCSA log file to analyze",
@@ -137,7 +136,22 @@ if __name__ == "__main__":
         help="specify maximum column width",
         type=int)
 
+    return parser
+
+
+#################################
+# End Main loop helper functions
+#################################
+
+if __name__ == "__main__":
+
+    import argparse
+    parser = argparse.ArgumentParser(description="generate a histogram from an Apache/NCSA log file showing per-minute usage")
+
+    parser = add_arguments( parser )
+
     args = parser.parse_args()
+
     if args.scaling_factor:
         SCALE_FACTOR = args.scaling_factor
     if args.columns:
