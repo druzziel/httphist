@@ -17,6 +17,7 @@ COLUMNS = 60
 ##########################################################
 
 def get_dictionary( startTime, endTime ):
+    "Returns a dictionary whose keys are timestamps between startTime and endTime, inclusive."
     i = startTime
     empty_dictionary = {}
     while i <= endTime:
@@ -34,7 +35,7 @@ def print_dictionary( dictionary, autoscale=False ):
     for dkey in dkeys:
         count = dictionary[dkey]
         histoLine = get_histogram_line( int( count * autoscale_factor ) )
-        print "{0} {1:>4} {2}".format(dkey, count, histoLine)
+        print "{0} {1:>7} {2}".format(dkey, count, histoLine)
 
 def get_histogram_line( lineCount ):
     # return a string of hash marks
@@ -50,6 +51,16 @@ def populate_dictionary( logfile, dictionary ):
         try:   # throw away any line without a timestamp
             timestamp = extract_time( line )
             dictionary[timestamp] += 1
+        except:
+            next
+
+def populate_bandwidth_dictionary( logfile, dictionary ):
+    logfile.seek(0)
+    for line in logfile:
+        try:
+            timestamp = extract_time( line )
+            bandwidth = extract_bandwidth( line )
+            dictionary[timestamp] += bandwidth
         except:
             next
 
@@ -95,6 +106,23 @@ def extract_time( input_line ):
 ##############################
 
 
+##############################
+# Bandwidth-handling functions
+##############################
+
+def extract_bandwidth( input_line ):
+    """Takes a line from the input file and returns the bytes transferred as an int"""
+    bits = input_line.split()
+    bandwidth = 0
+    try:
+        bandwidth = int(bits[9])
+    except:
+        pass
+    return bandwidth
+
+##################################
+# End Bandwidth-handling functions
+##################################
 
 #############################
 # Main loop helper functions
@@ -136,6 +164,10 @@ def add_arguments(parser):
         help="specify maximum column width",
         type=int)
 
+    parser.add_argument("-b", "--bandwidth",
+        help="provide bandwidth per minute instead of requests per minute",
+        action="store_true")
+
     return parser
 
 
@@ -156,6 +188,7 @@ if __name__ == "__main__":
         SCALE_FACTOR = args.scaling_factor
     if args.columns:
         COLUMNS = args.columns
+
     
     fp = openLog( args.logfile )
 
@@ -166,7 +199,11 @@ if __name__ == "__main__":
     myDictionary = get_dictionary(startTime, endTime)
 
     # fill 'er up
-    populate_dictionary( fp, myDictionary )
+    if not args.bandwidth:
+        populate_dictionary( fp, myDictionary )
+    else:
+        populate_bandwidth_dictionary( fp, myDictionary )
+
     fp.close()  # it's polite.
 
     # show us what you got
