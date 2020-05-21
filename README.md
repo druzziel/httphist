@@ -3,10 +3,11 @@ Python script for generating a histogram of requests per minute from common http
 
 # Usage
 
-	httphist [-h] [-s SCALING_FACTOR] [-a] [-c COLUMNS] logfile
+	httphist [-h] [-s SCALING_FACTOR] [-a] [-c COLUMNS] [-b] logfile
 	httphist -a access.log
 	httphist -a -c 80 access.log
 	httphist -s 2 access.log
+	httphist -s 1000 -b access.log
 
 
 Where access.log has the Apache common log format, e.g.:
