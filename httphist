@@ -107,7 +107,7 @@ def extract_time( input_line ):
 
 
 ##############################
-# Bandwidth-handling functions
+# Bandwidth-handling functions - experimental
 ##############################
 
 def extract_bandwidth( input_line ):
