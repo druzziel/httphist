@@ -26,16 +26,15 @@ def get_dictionary( startTime, endTime ):
     return empty_dictionary 
 
 def print_dictionary( dictionary, autoscale=False ):
-    longestLine = max(dictionary.iteritems(), key=operator.itemgetter(1))[1]
+    longestLine = max(dictionary.items(), key=operator.itemgetter(1))[1]
     autoscale_factor = float(COLUMNS) / longestLine
     if ( autoscale_factor >= 1 ) or ( not autoscale ):
         autoscale_factor = 1
-    dkeys = dictionary.keys()
-    dkeys.sort()
+    dkeys = sorted(dictionary.keys())
     for dkey in dkeys:
         count = dictionary[dkey]
         histoLine = get_histogram_line( int( count * autoscale_factor ) )
-        print "{0} {1:>7} {2}".format(dkey, count, histoLine)
+        print("{0} {1:>7} {2}".format(dkey, count, histoLine))
 
 def get_histogram_line( lineCount ):
     # return a string of hash marks
@@ -87,7 +86,7 @@ def convert_timestamp(apache_timestamp):
     try:
         time_obj = datetime.datetime.strptime( apache_timestamp, TIME_FORMAT )
     except:
-        raise TypeError, "%s is not a timestamp I recognize." % apache_timestamp
+        raise Exception("%s is not a timestamp I recognize." % apache_timestamp)
     return time_obj
 
 def extract_time( input_line ):
@@ -99,7 +98,7 @@ def extract_time( input_line ):
             return convert_timestamp( apache_timestamp )
         except:
             pass
-    raise ValueError, "Unreachable line reached - no timestamp found in input line {}".format( input_line )
+    raise Exception("Unreachable line reached - no timestamp found in input line {}".format( input_line ))
 
 ##############################
 # End Time-handling functions
@@ -132,7 +131,7 @@ def openLog( logFileName ):
     try:
         fp = open( logFileName )
     except:
-        print "Sorry, I couldn't open {0}.  Exiting.".format( logFileName )
+        print("Sorry, I couldn't open {0}.  Exiting.".format( logFileName ))
         sys.exit()
     return fp
 
